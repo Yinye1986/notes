@@ -14,8 +14,6 @@ public:
     head = newNode;                        // head指向newNode
   }
 
-  void delAtHead() {}
-
   void addAtTail(int value) {
     Node *newNode = new Node{value, nullptr};
     // 1. 如果空,直接head指向newNode
@@ -29,6 +27,37 @@ public:
       temp = temp->next;            // 则迭代遍历下一个
     }
     temp->next = newNode; // 此时temp是尾,让其指向新结点即可
+  }
+
+  void delAtHead() {
+    if (head == nullptr) {
+      return;
+    }
+    Node *temp = head;
+    head = head->next;
+    delete temp;
+  }
+
+  void delAtTail() {
+    if (head == nullptr)
+      return; // 空链表直接返回
+
+    // 使用双指针统一处理所有情况
+    Node *prev = nullptr;
+    Node *curr = head;
+
+    while (curr->next != nullptr) { // 找到最后一个节点
+      prev = curr;
+      curr = curr->next;
+    }
+
+    if (prev == nullptr) { // 单节点情况
+      delete head;
+      head = nullptr;
+    } else { // 多节点情况
+      prev->next = nullptr;
+      delete curr;
+    }
   }
 
   void insert_atAnywhere(int value, int n) { // 插到n的前面
@@ -52,6 +81,37 @@ public:
     temp->next = newNode;
   }
 
+  void delete_atAnywhere(int n) {
+    // 空链表或无效位置直接返回
+    if (head == nullptr || n < 1)
+      return;
+    if (n == 1) {
+      delAtHead();
+      return;
+    }
+    Node *prev = nullptr;
+    Node *curr = head;
+    int counter = 1; // 位置从 1 开始计数
+    // 遍历直到找到第 n 个节点或链表末尾
+    while (curr != nullptr && counter < n) {
+      prev = curr;
+      curr = curr->next;
+      counter++;
+    }
+    if (curr == nullptr)
+      return;
+
+    if (prev) { // 中间节点或尾节点
+      prev->next = curr->next;
+      if (curr->next == nullptr) {
+        // 隐含处理尾节点，但无需特殊操作
+      }
+      delete curr;
+    } else {       // 理论上不会触发此分支
+      delAtHead(); // 冗余安全措施
+    }
+  }
+
   void reverse_byIterativeMethod() {
     Node *prev, *current, *next;
     prev = nullptr;
@@ -66,8 +126,7 @@ public:
     head = current;
   }
 
-  //    Node reverse_byRecursiveMethod(Node head) {
-  //    }
+  void reverse_byRecursiveMethod(Node head) {}
 
   void print() {
     Node *temp = head;
@@ -108,11 +167,11 @@ int main() {
 
   while (1) {
     std::cout << " 1. 添加节点到链表头部" << std::endl;
-    std::cout << " 2. 头删" << std::endl;
-    std::cout << " 3. 添加节点到链表尾部" << std::endl;
-    std::cout << " 4. 尾删" << std::endl;
-    std::cout << " 5. 添加节点到指定位置" << std::endl;
-    std::cout << " 6. 指定删除" << std::endl;
+    std::cout << " 2. 添加节点到链表尾部" << std::endl;
+    std::cout << " 3. 添加节点到指定位置" << std::endl;
+    std::cout << " 4. 删除首元节点" << std::endl;
+    std::cout << " 5. 删除尾部节点" << std::endl;
+    std::cout << " 6. 指定位置删除" << std::endl;
     std::cout << " 7. 反转链表(迭代方法)" << std::endl;
     std::cout << " 8. 反转链表(递归方法)" << std::endl;
     std::cout << " 9. 打印链表" << std::endl;
@@ -135,27 +194,23 @@ int main() {
       break;
 
     case 3:
-      std::cout << "请输入要添加到链表尾部的值:";
-      std::cin >> value;
-      list.addAtTail(value);
-      break;
-
-    case 4:
-      std::cout << "请输入要添加到链表尾部的值:";
-      std::cin >> value;
-      list.addAtTail(value);
-      break;
-
-    case 5:
-      std::cout << "请输入值与要插入的制定位置:";
+      std::cout << "请输入值与要插入的指定位置:";
       std::cin >> value >> a;
       list.insert_atAnywhere(value, a);
       break;
 
+    case 4:
+      list.delAtHead();
+      break;
+
+    case 5:
+      list.delAtTail();
+      break;
+
     case 6:
-      std::cout << "请输入要添加到链表尾部的值:";
-      std::cin >> value;
-      list.addAtTail(value);
+      std::cout << "请输入要删除的值的位置:";
+      std::cin >> a;
+      list.delete_atAnywhere(a);
       break;
 
     case 7:
@@ -165,7 +220,8 @@ int main() {
 
     case 8:
       std::cout << "已反转";
-      //                list.head = list.reverse_byRecursiveMethod(head);
+      list.reverse_byIterativeMethod();
+      // list.head = list.reverse_byRecursiveMethod(head);
       break;
 
     case 9:
@@ -191,4 +247,3 @@ int main() {
 
   return 0;
 }
-
